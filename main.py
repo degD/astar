@@ -229,4 +229,5 @@ class Maze:
     
 if __name__ == '__main__':
     
-    Maze("mazes/m1").print()
+    maze_path = input("Enter path for the maze: ")
+    Maze(maze_path).print()
