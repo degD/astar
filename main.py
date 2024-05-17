@@ -1,4 +1,4 @@
-from colorama import Fore
+from colorama import Back
 import heapq
         
 
@@ -66,7 +66,7 @@ class Cell:
             h: Holds the heuristic distance from Cell to goal.
             g: Holds the distance from start to Cell.
             f: g + h.
-            parent_cell: Cell that comes before in the path.    
+            parent_cell: Cell that comes beBack in the path.    
             is_open: Is the Cell open for evaluation?
             is_open: Is the Cell visited?
         """
@@ -214,19 +214,19 @@ class Maze:
                 c = self.maze[(i, j)].v
                 
                 if c == 'X':
-                    s += Fore.RED + c + " " + Fore.RESET
+                    s += Back.RED + "  " + Back.RESET
                 elif c == 'S':
-                    s += Fore.YELLOW + c + " " + Fore.RESET
+                    s += Back.YELLOW + "  " + Back.RESET
                 elif c == 'G':
-                    s += Fore.GREEN + c + " " + Fore.RESET
+                    s += Back.GREEN + "  " + Back.RESET
                 elif self.maze[(i, j)] in self.path:
-                    s += Fore.BLUE + c + " " + Fore.RESET
+                    s += Back.BLUE + "  " + Back.RESET
                 else:
-                    s += Fore.WHITE + c + " " + Fore.RESET
+                    s += Back.WHITE + "  " + Back.RESET
         print(s)
         print(f"Collected {self.collected_coins} coins.")
             
     
 if __name__ == '__main__':
     
-    Maze("mazes/maze_31x31.txt").print()
+    Maze("mazes/m1").print()
