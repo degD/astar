@@ -56,7 +56,7 @@ class Coords:
 class Cell:
     """Single unit in the Maze."""
     
-    def __init__(self, f, g, h, i, j, v, parent_cell, is_open=False, is_visited=False):
+    def __init__(self, f, g, h, i, j, v, parent_cell, is_open=False):
         """
         Create a new Cell instance. 
         
@@ -68,14 +68,13 @@ class Cell:
             f: g + h.
             parent_cell: Cell that comes before in the path.    
             is_open: Is the Cell open for evaluation?
-            is_visited: Is the Cell visited?
+            is_open: Is the Cell visited?
         """
         self.f, self.g, self.h = f, g, h
         self.i, self.j = i, j
         self.v = v
         self.parent = parent_cell
         self.is_open = is_open
-        self.is_visited = is_visited
         
     def __repr__(self):
         if self.parent is None:
@@ -113,7 +112,7 @@ class Maze:
                         maze_raw[i].append(c)
         
         # Save maze width and height.
-        self.w, self.h = j+1, i+1
+        self.w, self.h = j, i+1
         print(self.w, self.h)
         
         # List of permutation of indexes from i=(0-h) and j=(0-w).
@@ -187,20 +186,22 @@ class Maze:
                     h = Coords.distance(ni, nj, self.goal_i, self.goal_j)
                     f = g + h
                     
-                    # If neighbor Cell
-                    if neighbor_cell.is_open:
-                        if f < neighbor_cell.f: 
-                            neighbor_cell.f = f
-                            neighbor_cell.parent = current
-                        
-                    elif not neighbor_cell.is_visited:
+                    # First time the neighbor Cell is visited.
+                    if not neighbor_cell.is_open:
                         neighbor_cell.f, neighbor_cell.g, neighbor_cell.h = f, g, h
                         neighbor_cell.parent = current
-                        heapq.heappush(open_list, neighbor_cell)
                         neighbor_cell.is_open = True
+                        heapq.heappush(open_list, neighbor_cell)
+                    
+                    # Found a shorter path to the neighbor Cell.
+                    # As Cells start with f=-1, this condition will not met until they get open.
+                    elif f < neighbor_cell.f: 
+                        neighbor_cell.f = f
+                        neighbor_cell.parent = current
                         
-            current.is_visited = True
-            
+            current.is_open = True
+        
+        # open_list got empty but goal haven't found. Return an empty list as path.
         return []
     
     
@@ -223,13 +224,9 @@ class Maze:
                 else:
                     s += Fore.WHITE + c + " " + Fore.RESET
         print(s)
+        print(f"Collected {self.collected_coins} coins.")
             
     
 if __name__ == '__main__':
     
-    m = Maze('mazes/m1')
-    for n in m.path:
-        print(n)
-    print(m.collected_coins)
-    
-    m.print()
+    Maze("mazes/maze_31x31.txt").print()
