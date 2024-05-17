@@ -55,7 +55,7 @@ class Coords:
 class Cell:
     """Single unit in the Maze."""
     
-    def __init__(self, f, g, h, i, j, v, parent_cell, is_open=True):
+    def __init__(self, f, g, h, i, j, v, parent_cell, is_open=False, is_visited=False):
         """
         Create a new Cell instance. 
         
@@ -66,13 +66,15 @@ class Cell:
             g: Holds the distance from start to Cell.
             f: g + h.
             parent_cell: Cell that comes before in the path.    
-            is_open: Is the Cell not visited yet (evaluated)?
+            is_open: Is the Cell open for evaluation?
+            is_visited: Is the Cell visited?
         """
         self.f, self.g, self.h = f, g, h
         self.i, self.j = i, j
         self.v = v
         self.parent = parent_cell
         self.is_open = is_open
+        self.is_visited = is_visited
         
     def __repr__(self):
         if self.parent is None:
@@ -183,17 +185,18 @@ class Maze:
                     f = g + h
                     
                     # If neighbor Cell
-                    if neighbor_cell in open_list:
+                    if neighbor_cell.is_open:
                         if f < neighbor_cell.f: 
                             neighbor_cell.f = f
                             neighbor_cell.parent = current
                         
-                    elif neighbor_cell.is_open:
+                    elif not neighbor_cell.is_visited:
                         neighbor_cell.f, neighbor_cell.g, neighbor_cell.h = f, g, h
                         neighbor_cell.parent = current
                         open_list.append(neighbor_cell)
+                        neighbor_cell.is_open = True
                         
-            current.is_open = False
+            current.is_visited = True
             
         return []
     
