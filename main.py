@@ -55,7 +55,6 @@ class Coords:
 
 class Cell:
     """Single unit in the Maze."""
-    cell_key = 0 
     
     def __init__(self, f, g, h, i, j, v, parent_cell, is_open=False, is_visited=False):
         """
@@ -78,22 +77,13 @@ class Cell:
         self.is_open = is_open
         self.is_visited = is_visited
         
-    def cellForHeap(self):
-        """
-        Helper function to use Cell with heapq. Because heapq cannot work with
-        objects other than numbers and tuples, represents cell in a tuple with
-        f value being the first value of the tuple. key value is necessary, as
-        heapq will look at the second value of tuples if first values are same.
-        The returned tuple will look something like this: (cell.f, key, cell)
-        """
-        key = Cell.cell_key
-        Cell.cell_key += 1
-        return (self.f, Cell.cell_key, self)
-        
     def __repr__(self):
         if self.parent is None:
             return f"{self.i},{self.j} - NoParent"
         return f"{self.i},{self.j} - {self.parent.i},{self.parent.j}"
+    
+    def __lt__(self, cell):
+        return self.f < cell.f
 
 
 class Maze:
@@ -155,14 +145,14 @@ class Maze:
         # Add starting Cell to open_list with g = 0 (as its distance to start is 0)
         start_cell = self.maze[(self.start_i, self.start_j)]
         start_cell.g = 0
-        heapq.heappush(open_list, start_cell.cellForHeap())
+        heapq.heappush(open_list, start_cell)
         
         # While open_list is not empty, so not all possible Cells are evaluated.
         while open_list:
             
             # Find the Cell with minimum f (total distance to goal) and remove it from open_list.
             # It will be called the 'current' Cell.
-            _, _, current = heapq.heappop(open_list)
+            current = heapq.heappop(open_list)
             
             # Look at current Cell's valid neighbors.
             for ni, nj in Coords.neighbors(current.i, current.j, self.w, self.h):
@@ -206,7 +196,7 @@ class Maze:
                     elif not neighbor_cell.is_visited:
                         neighbor_cell.f, neighbor_cell.g, neighbor_cell.h = f, g, h
                         neighbor_cell.parent = current
-                        heapq.heappush(open_list, neighbor_cell.cellForHeap())
+                        heapq.heappush(open_list, neighbor_cell)
                         neighbor_cell.is_open = True
                         
             current.is_visited = True
