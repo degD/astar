@@ -1,5 +1,4 @@
 from colorama import Fore
-import heapq
 
 
 class Coords:
@@ -56,7 +55,7 @@ class Coords:
 class Cell:
     """Single unit in the Maze."""
     
-    def __init__(self, f, g, h, i, j, v, parent_cell, is_visited=False, is_open=True):
+    def __init__(self, f, g, h, i, j, v, parent_cell, is_open=True):
         """
         Create a new Cell instance. 
         
@@ -73,7 +72,6 @@ class Cell:
         self.i, self.j = i, j
         self.v = v
         self.parent = parent_cell
-        self.is_visited = is_visited
         self.is_open = is_open
         
     def __repr__(self):
@@ -139,19 +137,17 @@ class Maze:
         open_list = []
         
         # Add starting Cell to open_list with g = 0 (as its distance to start is 0)
-        key = 0
         start_cell = self.maze[(self.start_i, self.start_j)]
         start_cell.g = 0
-        start_cell.is_open = True
-        heapq.heappush(open_list, (0, key, start_cell))
+        open_list.append(start_cell)
         
         # While open_list is not empty, so not all possible Cells are evaluated.
         while open_list:
             
             # Find the Cell with minimum f (total distance to goal) and remove it from open_list.
             # It will be called the 'current' Cell.
-            _, _, current = heapq.heappop(open_list)
-            current.is_open = False
+            current = min(open_list, key=lambda cell: cell.f)
+            open_list.remove(current)
             
             # Look at current Cell's valid neighbors.
             for ni, nj in Coords.neighbors(current.i, current.j, self.w, self.h):
@@ -186,24 +182,18 @@ class Maze:
                     h = Coords.distance(ni, nj, self.goal_i, self.goal_j)
                     f = g + h
                     
-                    # Neighbor Cell is not visited but open for visiting.
-                    # If f is less than the previous f, a shorter path to this Cell is found.
-                    # So, update f and parent values of Cell.
-                    if neighbor_cell.is_open:
+                    # If neighbor Cell
+                    if neighbor_cell in open_list:
                         if f < neighbor_cell.f: 
                             neighbor_cell.f = f
                             neighbor_cell.parent = current
-                    
-                    # Neighbor Cell is not open for visiting but also not visited yet. It is 
-                    # the first time we encounter with this Cell. Add it to open_list. 
-                    elif not neighbor_cell.is_visited:
+                        
+                    elif neighbor_cell.is_open:
                         neighbor_cell.f, neighbor_cell.g, neighbor_cell.h = f, g, h
                         neighbor_cell.parent = current
-                        key += 1
-                        heapq.heappush(open_list, (neighbor_cell.f, key, neighbor_cell))
-            
-            # All neighbors of the current Cell is evaluated. Now this Cell is visited.
-            current.is_visited = True
+                        open_list.append(neighbor_cell)
+                        
+            current.is_open = False
             
         return []
     
