@@ -247,7 +247,7 @@ class Maze:
     
 if __name__ == '__main__':
     
-    # maze_path = input("Enter path for the maze: ")
-    m = Maze("mazes/maze_101x101.txt")
-    # m.print()
+    maze_path = input("Enter path for the maze: ")
+    m = Maze(maze_path)
+    m.print()
     m.time_a_star(n=100000)
