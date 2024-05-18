@@ -1,5 +1,6 @@
 from colorama import Back
 import heapq
+import time
         
 
 class Coords:
@@ -113,7 +114,6 @@ class Maze:
         
         # Save maze width and height.
         self.w, self.h = j, i+1
-        print(self.w, self.h)
         
         # List of permutation of indexes from i=(0-h) and j=(0-w).
         self.indexes = ((i, j) for i in range(self.h) for j in range(self.w))
@@ -205,6 +205,24 @@ class Maze:
         return []
     
     
+    def time_a_star(self, n=100):
+        """
+        Count and print time it took for A* to find a path (or fail).
+        
+        Args:
+            n: Number of times to run A* algorithm to get a better average value.
+        """
+        
+        time_sum = 0
+        for i in range(n):
+            start = time.perf_counter_ns()
+            self.a_star_pathfind()
+            stop = time.perf_counter_ns()
+            time_sum += stop-start
+
+        print("Times: {}, Total: {}ms, Avg: {}ms".format(n, round(time_sum/1000, 4), round((time_sum/1000)/n, 4)))
+    
+    
     def print(self):
         """Prints the maze and the path, colored and formatted."""
         s = ""
@@ -229,5 +247,7 @@ class Maze:
     
 if __name__ == '__main__':
     
-    maze_path = input("Enter path for the maze: ")
-    Maze(maze_path).print()
+    # maze_path = input("Enter path for the maze: ")
+    m = Maze("mazes/maze_101x101.txt")
+    # m.print()
+    m.time_a_star(n=100000)
